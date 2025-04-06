@@ -7,12 +7,21 @@ import Upload from '../pages/ImageDetailPage.vue'
 import Profile from '../pages/ProfilePage.vue'
 import Auth from '../pages/AuthPage.vue'
 
+
+
+
+
+
 const routes = [
+  
+  
   {
     path: '/',
     name: 'Home',
     component: Home,
+    alias: '/home', 
   },
+  
   {
     path: '/category',
     name: 'Category',
