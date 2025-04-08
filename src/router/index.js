@@ -12,8 +12,13 @@ import Auth from '../pages/AuthPage.vue'
 
 
 
+
 const routes = [
   
+  {
+    path: '/oauth2-success',
+    component: () => import('@/pages/OAuth2Success.vue')  // Component chứa đoạn xử lý token
+  },
   
   {
     path: '/',

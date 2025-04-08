@@ -15,6 +15,16 @@ const { isLoggedIn, user } = storeToRefs(userStore)
 
 const logout = async () => {
   try {
+    // Kiểm tra nếu người dùng đã đăng nhập bằng Google (có thể kiểm tra theo token hoặc một thuộc tính đặc biệt)
+    const isGoogleLogin = userStore.token && userStore.token.includes('google');
+
+    if (isGoogleLogin) {
+      // Đăng xuất từ Google
+      window.location.href = 'https://accounts.google.com/Logout';  // Chuyển hướng tới trang đăng xuất của Google
+      return; // Dừng lại, không cần xử lý thêm
+    }
+
+    // Đăng xuất bình thường từ server của bạn
     const response = await fetch('http://localhost:8080/api/logout', {
       method: 'POST',
       headers: {
@@ -64,11 +74,15 @@ const logout = async () => {
             <span>Upload</span>
           </RouterLink>
           <div class="relative group">
+            <!-- Thêm kiểm tra điều kiện để tránh lỗi khi user không tồn tại -->
             <img
+              v-if="user && user[0] && user[0].account"
               :src="user[0].account.avatarUrl || 'https://via.placeholder.com/40'"
               alt="avatar"
               class="w-10 h-10 rounded-full cursor-pointer"
             />
+            <!-- Hiển thị avatar placeholder nếu chưa có avatar -->
+            <img v-else src="https://via.placeholder.com/40" alt="avatar" class="w-10 h-10 rounded-full cursor-pointer" />
 
             <div class="absolute top-12 right-0 mt-2 w-56 bg-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <ul class="py-2">

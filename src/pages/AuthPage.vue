@@ -24,7 +24,7 @@
 
       <!-- Google Button -->
           <div class="flex justify-center space-x-4">
-      <a href="/api/user/login" class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg w-full hover:bg-gray-50">
+      <button @click="loginWithGoogle" class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg w-full hover:bg-gray-50">
         <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
           <!-- Google icon -->
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -33,7 +33,7 @@
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
         <span>Continue with Google</span>
-      </a>
+      </button>
     </div>
 
       
@@ -163,47 +163,52 @@ export default {
     };
   },
   methods: {
+    loginWithGoogle() {
+      window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
     async handleSubmit() {
-      const userStore = useUserStore()
-      const userCredentials = {
-        username: this.email,
-        password: this.password,
-      };
+  const userStore = useUserStore();  // Lấy store người dùng
+  const userCredentials = {
+    username: this.email,
+    password: this.password,
+  };
 
-      try {
-        let response;
-        if (this.isLogin) {
-          response = await axios.post('http://localhost:8080/api/login', userCredentials);
-      
-      
-          const token = response.data.token
-          const user = response.data.userRoles
+  try {
+    let response;
 
-          // Sử dụng Pinia để cập nhật state
-          userStore.setUser(user, token)
-      // Reset thông báo lỗi
-      this.errorMessage = '';
-      
-      // Chuyển hướng người dùng đến trang chính (home)
-      localStorage.setItem('isLoggedIn', true);
-      this.$router.push('/home');
-        } else {
-          // Xử lý đăng ký
-          console.log('Sign Up logic here');
-          // Gửi yêu cầu đăng ký nếu cần
-        }
-      } catch (error) {
-        console.error('Login failed:', error);
-        if (error.response && error.response.status === 401) {
-          this.errorMessage = 'Invalid username or password';
-        } else {
-          this.errorMessage = 'An error occurred. Please try again.';
-        }
-      }
-    },
+    // Kiểm tra xem người dùng có đang đăng nhập bằng Google không
+    if (this.isLogin ) 
+    
+      response = await axios.post('http://localhost:8080/api/login', userCredentials);
+  
+
+    const token = response.data.token;
+    const user = response.data.userRoles;
+
+    // Lưu thông tin người dùng và token vào store
+    userStore.setUser(user, token);
+
+    // Reset thông báo lỗi
+    this.errorMessage = '';
+    
+    // Lưu trạng thái đăng nhập vào localStorage để theo dõi trạng thái đăng nhập
+    localStorage.setItem('isLoggedIn', true);
+    
+    // Chuyển hướng người dùng đến trang chính (home)
+    this.$router.push('/home');
+  } catch (error) {
+    console.error('Login failed:', error);
+    if (error.response && error.response.status === 401) {
+      this.errorMessage = 'Invalid username or password';
+    } else {
+      this.errorMessage = 'An error occurred. Please try again.';
+    }
+  }
+}
+
   },
 };
 </script>
