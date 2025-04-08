@@ -189,16 +189,21 @@ export default {
     const user = response.data.userRoles;
 
     // Lưu thông tin người dùng và token vào store
-    userStore.setUser(user, token);
-
-    // Reset thông báo lỗi
     this.errorMessage = '';
     
-    // Lưu trạng thái đăng nhập vào localStorage để theo dõi trạng thái đăng nhập
-    localStorage.setItem('isLoggedIn', true);
     
-    // Chuyển hướng người dùng đến trang chính (home)
-    this.$router.push('/home');
+        
+    if (user[0]?.role?.roleID === "GUEST" || user[0]?.role?.roleID === "USER") {
+      this.$router.push('/home');
+    } else {
+      
+      console.warn("User role not authorized:", userRole);
+      this.errorMessage = 'khong cos quyen ';
+    }
+    userStore.setUser(user, token);
+    localStorage.setItem('isLoggedIn', true);
+
+
   } catch (error) {
     console.error('Login failed:', error);
     if (error.response && error.response.status === 401) {
