@@ -170,7 +170,7 @@ export default {
       this.showPassword = !this.showPassword;
     },
     async handleSubmit() {
-  const userStore = useUserStore();  // Lấy store người dùng
+  const userStore = useUserStore();  
   const userCredentials = {
     username: this.email,
     password: this.password,

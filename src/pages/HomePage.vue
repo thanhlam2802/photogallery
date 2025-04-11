@@ -23,25 +23,21 @@
       </section>
   
       <!-- Categories Section -->
+     <!-- Categories Section (Tag Style) -->
       <section class="container mx-auto px-4 py-12">
         <h2 class="text-2xl font-bold mb-6">Browse Categories</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div
+        <div class="flex flex-wrap gap-3">
+          <button
             v-for="category in categories"
             :key="category.name"
-            class="relative h-40 rounded-lg overflow-hidden group cursor-pointer"
+            @click="handleCategoryClick(category.name)"
+            class="px-4 py-2 rounded-full border border-gray-300 text-gray-800 hover:bg-gray-100 transition"
           >
-            <img
-              :src="category.imageUrl"
-              :alt="category.name"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
-              <h3 class="text-xl font-semibold text-white">{{ category.name }}</h3>
-            </div>
-          </div>
+            {{ category.name }}
+          </button>
         </div>
       </section>
+
   
       <!-- Featured Images -->
       <section class="container mx-auto px-4 py-12">
@@ -79,7 +75,7 @@
   <script>
  import SearchBar from '../components/ui/SearchBar.vue';
   import ImageCard from '../components/ui/ImageCard.vue';
-  
+  import axios from 'axios'
   export default {
     components: {
       SearchBar,
@@ -88,22 +84,10 @@
     data() {
       return {
         likedImages: [],
-        featuredImages: [
-          { id: '1', imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb', photographer: { name: 'Kevin Hoang', username: 'kevinhoang' } },
-          { id: '2', imageUrl: 'https://images.unsplash.com/photo-1511300636408-a63a89df3482', photographer: { name: 'Minh Pham', username: 'minhpham' } },
-          { id: '3', imageUrl: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470', photographer: { name: 'Lan Nguyen', username: 'lannguyen' } },
-          { id: '4', imageUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05', photographer: { name: 'Tuan Tran', username: 'tuantran' } },
-          { id: '5', imageUrl: 'https://images.unsplash.com/photo-1497449493050-aad1e7cad165', photographer: { name: 'Linh Pham', username: 'linhpham' } },
-          { id: '6', imageUrl: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e', photographer: { name: 'Huy Nguyen', username: 'huynguyen' } },
-          { id: '7', imageUrl: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e', photographer: { name: 'Trung Le', username: 'trunglee' } },
-          { id: '8', imageUrl: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e', photographer: { name: 'Quang Tran', username: 'quangtran' } },
-        ],
-        categories: [
-          { name: 'Nature', imageUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e' },
-          { name: 'Architecture', imageUrl: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625' },
-          { name: 'Travel', imageUrl: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1' },
-          { name: 'Food', imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836' },
-        ],
+        featuredImages: [],
+        categories: [],
+
+
       }
     },
     methods: {
@@ -117,12 +101,33 @@
           this.likedImages.push(id)
         }
       },
+      async fetchFeaturedImages(page = 0) {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/images/featured?page=${page}`)
+        this.featuredImages = response.data
+      } catch (error) {
+        console.error('Failed to fetch featured images:', error)
+      }
     },
+    async fetchCategoryFeaturedImages() {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/images/top-tags`)
+        this.categories = response.data
+      } catch (error) {
+        console.error('Failed to fetch Category featured images:', error)
+      }
+    },
+      
+    },
+    mounted() {
+    this.fetchFeaturedImages()
+    this.fetchCategoryFeaturedImages()
+  },
   }
   </script>
   
   <style scoped>
-  /* Add any custom styles here */
+ 
   </style>
   
 

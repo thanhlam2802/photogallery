@@ -7,7 +7,23 @@ import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const isMenuOpen = ref(false)
+const showDropdown = ref(false)
+let hideTimeout = null
 
+const handleMouseEnter = () => {
+  if (hideTimeout) {
+    clearTimeout(hideTimeout)
+    hideTimeout = null
+  }
+  showDropdown.value = true
+}
+
+const handleMouseLeave = () => {
+  hideTimeout = setTimeout(() => {
+    showDropdown.value = false
+    hideTimeout = null
+  }, 200) // delay 1 giây
+}
 const userStore = useUserStore()
 userStore.loadFromLocalStorage()
 
@@ -15,13 +31,12 @@ const { isLoggedIn, user } = storeToRefs(userStore)
 
 const logout = async () => {
   try {
-    // Kiểm tra nếu người dùng đã đăng nhập bằng Google (có thể kiểm tra theo token hoặc một thuộc tính đặc biệt)
     const isGoogleLogin = userStore.token && userStore.token.includes('google');
 
     if (isGoogleLogin) {
-      // Đăng xuất từ Google
-      window.location.href = 'https://accounts.google.com/Logout';  // Chuyển hướng tới trang đăng xuất của Google
-      return; // Dừng lại, không cần xử lý thêm
+      
+      window.location.href = 'https://accounts.google.com/Logout'; 
+      return; 
     }
 
     // Đăng xuất bình thường từ server của bạn
@@ -73,40 +88,51 @@ const logout = async () => {
             <UploadIcon class="w-5 h-5 mr-1" />
             <span>Upload</span>
           </RouterLink>
-          <div class="relative group">
-            <!-- Thêm kiểm tra điều kiện để tránh lỗi khi user không tồn tại -->
-            <img
-              v-if="user && user[0] && user[0].account"
-              :src="user[0].account.avatarUrl || 'https://via.placeholder.com/40'"
-              alt="avatar"
-              class="w-10 h-10 rounded-full cursor-pointer"
-            />
-            <!-- Hiển thị avatar placeholder nếu chưa có avatar -->
-            <img v-else src="https://via.placeholder.com/40" alt="avatar" class="w-10 h-10 rounded-full cursor-pointer" />
+          <div
+  class="relative"
+  @mouseenter="handleMouseEnter"
+  @mouseleave="handleMouseLeave"
+>
+  <img
+    v-if="user && user[0] && user[0].account"
+    :src="user[0].account.avatarUrl || 'https://via.placeholder.com/40'"
+    alt="avatar"
+    class="w-10 h-10 rounded-full cursor-pointer"
+  />
+  <img
+    v-else
+    src="https://via.placeholder.com/40"
+    alt="avatar"
+    class="w-10 h-10 rounded-full cursor-pointer"
+  />
 
-            <div class="absolute top-12 right-0 mt-2 w-56 bg-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <ul class="py-2">
-                <RouterLink :to="`/profile/${user?.id || 'user'}`">
-                  <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                    <i class="fas fa-user text-gray-500 mr-3"></i>
-                    <span>Hồ sơ của bạn</span>
-                  </li>
-                </RouterLink>
-                <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                  <i class="fas fa-bookmark text-gray-500 mr-3"></i>
-                  <span>Bộ sưu tập của bạn</span>
-                </li>
-                <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                  <i class="fas fa-cog text-gray-500 mr-3"></i>
-                  <span>Cài đặt</span>
-                </li>
-                <li class="border-t my-2"></li>
-                <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" @click="logout">
-                  <span>Đăng xuất</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+  <div
+    class="absolute top-12 right-0 mt-2 w-56 bg-white rounded-lg shadow-lg transition-opacity duration-300"
+    :class="{ 'opacity-100': showDropdown, 'opacity-0 pointer-events-none': !showDropdown }"
+  >
+    <ul class="py-2">
+      <RouterLink :to="`/profile/${user?.id || 'user'}`">
+        <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+          <i class="fas fa-user text-gray-500 mr-3"></i>
+          <span>Hồ sơ của bạn</span>
+        </li>
+      </RouterLink>
+      <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+        <i class="fas fa-bookmark text-gray-500 mr-3"></i>
+        <span>Bộ sưu tập của bạn</span>
+      </li>
+      <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+        <i class="fas fa-cog text-gray-500 mr-3"></i>
+        <span>Cài đặt</span>
+      </li>
+      <li class="border-t my-2"></li>
+      <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" @click="logout">
+        <span>Đăng xuất</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
         </template>
         <template v-else>
           <RouterLink

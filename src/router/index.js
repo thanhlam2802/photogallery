@@ -3,10 +3,10 @@ import process from 'process';
 
 import Home from '../pages/HomePage.vue'
 import Category from '../pages/CategoryPage.vue'
-import Upload from '../pages/ImageDetailPage.vue'
+import ImageDEtail from '../pages/ImageDetailPage.vue'
 import Profile from '../pages/ProfilePage.vue'
 import Auth from '../pages/AuthPage.vue'
-
+import Upload from '../pages/Upload.vue'
 
 
 
