@@ -70,12 +70,21 @@
         </div>
       </section>
     </div>
+    <div
+  v-if="showSuccessMessage"
+  class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg transition-opacity duration-500 z-50"
+>
+  Upload thành công!
+</div>
+
   </template>
   
   <script>
+  import { useRoute } from 'vue-router';
  import SearchBar from '../components/ui/SearchBar.vue';
   import ImageCard from '../components/ui/ImageCard.vue';
   import axios from 'axios'
+  
   export default {
     components: {
       SearchBar,
@@ -86,7 +95,7 @@
         likedImages: [],
         featuredImages: [],
         categories: [],
-
+        showSuccessMessage: false,
 
       }
     },
@@ -122,6 +131,15 @@
     mounted() {
     this.fetchFeaturedImages()
     this.fetchCategoryFeaturedImages()
+    const route = useRoute();
+    if (route.query.uploaded === 'true') {
+      this.showSuccessMessage = true;
+      setTimeout(() => {
+        this.showSuccessMessage = false;
+      }, 3000);
+    
+    }
+  
   },
   }
   </script>
