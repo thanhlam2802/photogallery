@@ -1,66 +1,65 @@
 <script setup>
-import { ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
-import { MenuIcon, XIcon, UserIcon, UploadIcon } from 'lucide-vue-next'
-import { useUserStore } from '@/stores/userStore'
-import { storeToRefs } from 'pinia'
+import { ref } from "vue";
+import { RouterLink, useRouter } from "vue-router";
+import { MenuIcon, XIcon, UserIcon, UploadIcon } from "lucide-vue-next";
+import { useUserStore } from "@/stores/userStore";
+import { storeToRefs } from "pinia";
 
-const router = useRouter()
-const isMenuOpen = ref(false)
-const showDropdown = ref(false)
-let hideTimeout = null
+const router = useRouter();
+const isMenuOpen = ref(false);
+const showDropdown = ref(false);
+let hideTimeout = null;
 
 const handleMouseEnter = () => {
   if (hideTimeout) {
-    clearTimeout(hideTimeout)
-    hideTimeout = null
+    clearTimeout(hideTimeout);
+    hideTimeout = null;
   }
-  showDropdown.value = true
-}
+  showDropdown.value = true;
+};
 
 const handleMouseLeave = () => {
   hideTimeout = setTimeout(() => {
-    showDropdown.value = false
-    hideTimeout = null
-  }, 200) // delay 1 giây
-}
-const userStore = useUserStore()
-userStore.loadFromLocalStorage()
+    showDropdown.value = false;
+    hideTimeout = null;
+  }, 200); // delay 1 giây
+};
+const userStore = useUserStore();
+userStore.loadFromLocalStorage();
 
-const { isLoggedIn, user } = storeToRefs(userStore)
+const { isLoggedIn, user } = storeToRefs(userStore);
 
 const logout = async () => {
   try {
-    const isGoogleLogin = userStore.token && userStore.token.includes('google');
+    const isGoogleLogin = userStore.token && userStore.token.includes("google");
 
     if (isGoogleLogin) {
-      
-      window.location.href = 'https://accounts.google.com/Logout'; 
-      return; 
+      window.location.href = "https://accounts.google.com/Logout";
+      return;
     }
 
-    // Đăng xuất bình thường từ server của bạn
-    const response = await fetch('http://localhost:8080/api/logout', {
-      method: 'POST',
+    
+    const response = await fetch("http://localhost:8080/api/logout", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userStore.token}`,
-      }
-    })
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userStore.token}`,
+      },
+    });
 
     if (response.ok) {
-      userStore.logout()
-      router.push('/auth')
+      userStore.logout();
+      router.push("/auth");
     } else {
-      const errorMessage = await response.text()
-      console.error('Logout failed:', errorMessage)
-      alert('Đăng xuất thất bại, vui lòng thử lại!')
+      const errorMessage = await response.text();
+      console.error("Logout failed:", errorMessage);
+      alert("Đăng xuất thất bại, vui lòng thử lại!");
     }
   } catch (error) {
-    console.error('Logout error:', error)
-    alert('Có lỗi xảy ra, vui lòng thử lại!')
+    console.error("Logout error:", error);
+    alert("Có lỗi xảy ra, vui lòng thử lại!");
   }
-}
+};
 </script>
 
 <template>
@@ -71,8 +70,12 @@ const logout = async () => {
       </RouterLink>
 
       <nav class="hidden md:flex items-center space-x-6">
-        <RouterLink to="/" class="text-gray-600 hover:text-gray-900">Home</RouterLink>
-        <RouterLink to="/category" class="text-gray-600 hover:text-gray-900">Explore</RouterLink>
+        <RouterLink to="/" class="text-gray-600 hover:text-gray-900"
+          >Home</RouterLink
+        >
+        <RouterLink to="/category" class="text-gray-600 hover:text-gray-900"
+          >Explore</RouterLink
+        >
         <RouterLink
           :to="{ path: '/category', query: { collection: 'popular' } }"
           class="text-gray-600 hover:text-gray-900"
@@ -89,50 +92,63 @@ const logout = async () => {
             <span>Upload</span>
           </RouterLink>
           <div
-  class="relative"
-  @mouseenter="handleMouseEnter"
-  @mouseleave="handleMouseLeave"
->
-  <img
-    v-if="user && user[0] && user[0].account"
-    :src="user[0].account.avatarUrl || 'https://via.placeholder.com/40'"
-    alt="avatar"
-    class="w-10 h-10 rounded-full cursor-pointer"
-  />
-  <img
-    v-else
-    src="https://via.placeholder.com/40"
-    alt="avatar"
-    class="w-10 h-10 rounded-full cursor-pointer"
-  />
+            class="relative"
+            @mouseenter="handleMouseEnter"
+            @mouseleave="handleMouseLeave"
+          >
+            <img
+              v-if="user && user[0] && user[0].account"
+              :src="
+                user[0].account.avatarUrl || 'https://via.placeholder.com/40'
+              "
+              alt="avatar"
+              class="w-10 h-10 rounded-full cursor-pointer"
+            />
+            <img
+              v-else
+              src="https://via.placeholder.com/40"
+              alt="avatar"
+              class="w-10 h-10 rounded-full cursor-pointer"
+            />
 
-  <div
-    class="absolute top-12 right-0 mt-2 w-56 bg-white rounded-lg shadow-lg transition-opacity duration-300"
-    :class="{ 'opacity-100': showDropdown, 'opacity-0 pointer-events-none': !showDropdown }"
-  >
-    <ul class="py-2">
-      <RouterLink :to="`/profile/${user?.id || 'user'}`">
-        <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-          <i class="fas fa-user text-gray-500 mr-3"></i>
-          <span>Hồ sơ của bạn</span>
-        </li>
-      </RouterLink>
-      <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-        <i class="fas fa-bookmark text-gray-500 mr-3"></i>
-        <span>Bộ sưu tập của bạn</span>
-      </li>
-      <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-        <i class="fas fa-cog text-gray-500 mr-3"></i>
-        <span>Cài đặt</span>
-      </li>
-      <li class="border-t my-2"></li>
-      <li class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" @click="logout">
-        <span>Đăng xuất</span>
-      </li>
-    </ul>
-  </div>
-</div>
-
+            <div
+              class="absolute top-12 right-0 mt-2 w-56 bg-white rounded-lg shadow-lg transition-opacity duration-300"
+              :class="{
+                'opacity-100': showDropdown,
+                'opacity-0 pointer-events-none': !showDropdown,
+              }"
+            >
+              <ul class="py-2">
+                <RouterLink :to="`/profile/${user?.id || 'user'}`">
+                  <li
+                    class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    <i class="fas fa-user text-gray-500 mr-3"></i>
+                    <span>Hồ sơ của bạn</span>
+                  </li>
+                </RouterLink>
+                <li
+                  class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  <i class="fas fa-bookmark text-gray-500 mr-3"></i>
+                  <span>Bộ sưu tập của bạn</span>
+                </li>
+                <li
+                  class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  <i class="fas fa-cog text-gray-500 mr-3"></i>
+                  <span>Cài đặt</span>
+                </li>
+                <li class="border-t my-2"></li>
+                <li
+                  class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  @click="logout"
+                >
+                  <span>Đăng xuất</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </template>
         <template v-else>
           <RouterLink
@@ -154,8 +170,14 @@ const logout = async () => {
 
     <div v-if="isMenuOpen" class="md:hidden bg-white border-t border-gray-100">
       <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
-        <RouterLink to="/" class="py-2 text-gray-600 hover:text-gray-900">Home</RouterLink>
-        <RouterLink to="/category" class="py-2 text-gray-600 hover:text-gray-900">Explore</RouterLink>
+        <RouterLink to="/" class="py-2 text-gray-600 hover:text-gray-900"
+          >Home</RouterLink
+        >
+        <RouterLink
+          to="/category"
+          class="py-2 text-gray-600 hover:text-gray-900"
+          >Explore</RouterLink
+        >
         <RouterLink
           :to="{ path: '/category', query: { collection: 'popular' } }"
           class="py-2 text-gray-600 hover:text-gray-900"
