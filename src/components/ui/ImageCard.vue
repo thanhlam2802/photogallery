@@ -1,68 +1,69 @@
 <template>
-  <div
-    class="group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-  >
-    <router-link :to="`/photo/${id}`">
-      <img
-        :src="imageUrl"
-        :alt="title || `Photo by ${photographer.name}`"
-        class="w-full h-full object-cover"
-        loading="lazy"
-      />
-    </router-link>
-    <!-- Gradients background on hover -->
-    <div
-      class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-    ></div>
-    <div
-      class="absolute bottom-0 left-0 right-0 p-3 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-    >
-      <!-- Photographer Info -->
-      <router-link
-        :to="`/profile/${photographer.username}`"
-        class="flex items-center"
-      >
+  <div class="mb-4 break-inside-avoid">
+    <div class="group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+      <!-- Ảnh chính -->
+      <router-link :to="`/photo/${id}`">
         <img
-          v-if="photographer.avatarUrl"
-          :src="photographer.avatarUrl"
-          :alt="photographer.name"
-          class="w-8 h-8 rounded-full mr-2"
+          :src="imageUrl"
+          :alt="title || `Photo by ${photographer.name}`"
+          class="w-full object-cover rounded"
+          loading="lazy"
         />
-        <div
-          v-else
-          class="w-8 h-8 rounded-full bg-gray-300 mr-2 flex items-center justify-center"
-        >
-          {{ photographer.name.charAt(0) }}
-        </div>
-        <span class="text-white text-sm font-medium truncate">{{
-          photographer.name
-        }}</span>
       </router-link>
-      <!-- Actions: Like and Download -->
-      <div class="flex space-x-2">
-        <!-- Like Button -->
-        <button
-          @click="handleLike"
-          class="p-1.5 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
-          :class="{ 'text-red-500': liked, 'text-white': !liked }"
+
+      <!-- Lớp mờ đen khi hover -->
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      ></div>
+
+      <!-- Thông tin photographer + hành động -->
+      <div
+        class="absolute bottom-0 left-0 right-0 p-3 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      >
+        <!-- Photographer -->
+        <router-link
+          :to="`/profile/${photographer.username}`"
+          class="flex items-center"
         >
-          <i
-            class="fa fa-heart"
-            :class="liked ? 'text-red-500' : 'text-white'"
-          ></i>
-        </button>
-        <!-- Download Button -->
-        <!-- Download Button -->
-        <button
-          @click.stop="downloadImage"
-          class="p-1.5 rounded-full bg-black/30 hover:bg-black/50 text-white transition-colors"
-        >
-          <i class="fa fa-download"></i>
-        </button>
+          <img
+            v-if="photographer.avatarUrl"
+            :src="photographer.avatarUrl"
+            :alt="photographer.name"
+            class="w-8 h-8 rounded-full object-cover mr-2"
+          />
+          <div
+            v-else
+            class="w-8 h-8 rounded-full bg-gray-300 mr-2 flex items-center justify-center text-sm font-medium "
+          >
+            {{ photographer.name.charAt(0) }}
+          </div>
+          <span class="text-white text-sm font-medium truncate">
+            {{ photographer.name }}
+          </span>
+        </router-link>
+
+        <!-- Like & Download -->
+        <div class="flex space-x-2">
+          <button
+            @click="handleLike"
+            class="p-1.5 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
+            :class="{ 'text-red-500': liked, 'text-white': !liked }"
+          >
+            <i class="fa fa-heart"></i>
+          </button>
+          <button
+            @click.stop="downloadImage"
+            class="p-1.5 rounded-full bg-black/30 hover:bg-black/50 text-white transition-colors"
+          >
+            <i class="fa fa-download"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+
 
 <script>
 import { defineComponent } from "vue";
@@ -83,6 +84,14 @@ export default defineComponent({
       type: String,
       default: "",
     },
+    width: {
+    type: Number,
+    default: null,
+  },
+  height: {
+    type: Number,
+    default: null,
+  },
     photographer: {
       type: Object,
       required: true,
@@ -104,6 +113,8 @@ export default defineComponent({
       default: null,
     },
   },
+  
+
   methods: {
     handleLike(event) {
       event.preventDefault();
@@ -156,4 +167,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.break-inside-avoid {
+  break-inside: avoid;
+}</style>

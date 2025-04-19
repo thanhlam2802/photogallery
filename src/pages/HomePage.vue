@@ -37,18 +37,20 @@
           </button>
         </div>
       </section>
-
+      
   
       <!-- Featured Images -->
       <section class="container mx-auto px-4 py-12">
         <h2 class="text-2xl font-bold mb-6">Featured Photos</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           <ImageCard
             v-for="image in featuredImages"
             :key="image.id"
             :id="image.id"
             :imageUrl="image.imageUrl"
             :photographer="image.photographer"
+            :width="image.width"
+            :height="image.height"
             :liked="likedImages.includes(image.id)"
             @like="handleLike(image.id)"
           />

@@ -230,7 +230,8 @@
       formData.append('title', img.title || "");
       formData.append('location', img.location || "");
       formData.append('username', user.value[0].account?.username);
-  
+      formData.append('width', img.width);
+    formData.append('height', img.height);
       if (img.tags && img.tags.length > 0) {
         img.tags.forEach(tag => {
           formData.append('tags', JSON.stringify(img.tags));
@@ -284,6 +285,8 @@
               title: "",
               tags: [],
               location: "",
+              width: img.width,
+  height: img.height,
               file
             });
           }
