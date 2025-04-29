@@ -54,6 +54,12 @@ const routes = [
     name: 'Auth',
     component: Auth,
   },
+  {
+    path: "/photo/:id",
+    name: "ImageDetail",
+    component: ImageDEtail,
+    props: true,
+  },
 ]
 
 const router = createRouter({
